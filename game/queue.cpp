@@ -1,8 +1,7 @@
 #include "stage.hpp"
 
-void manageQueue(std::queue<sf::Sound>& q, const sf::Vector3f lpos) //play mode
+void manageQueue(std::queue<sf::Sound>& q) //play mode
 {
-	sf::Listener::setPosition(lpos);
 	while (!q.empty()) {
 		if (q.front().getStatus() == sf::Sound::Stopped) {
 			q.pop();

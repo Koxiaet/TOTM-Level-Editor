@@ -405,8 +405,10 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 			}
 		}
 
-		manageQueue(que_blade, sf::Vector3f(player.tempx, 0.0f, player.tempy));
-		manageQueue(que_bullet_launch, sf::Vector3f(player.tempx, 0.0f, player.tempy));
+		sf::Listener::setPosition(sf::Vector3f(player.tempx, 0.0f, player.tempy));
+
+		manageQueue(que_blade);
+		manageQueue(que_bullet_launch);
 		manageQueue(que_coin);
 		manageQueue(que_breakableBlock);
 	}

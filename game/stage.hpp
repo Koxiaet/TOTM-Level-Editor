@@ -138,7 +138,7 @@ public:
 	~stage();
 };
 
-void manageQueue(std::queue<sf::Sound>& q, const sf::Vector3f lpos = sf::Vector3f(0, 0, 0)); //play mode
+void manageQueue(std::queue<sf::Sound>& q); //play mode
 void addToQueue(std::queue<sf::Sound>& q, const sf::Sound s, const sf::Vector3f pos = sf::Vector3f(0, 0, 0)); //play mode
 
 #endif
