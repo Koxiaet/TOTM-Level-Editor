@@ -19,6 +19,7 @@ void addToQueue(std::queue<sf::Sound>& q, const sf::Sound s, const sf::Vector3f 
 	if (pos != sf::Vector3f(0, 0, 0)) {
 		q.back().setMinDistance(32);
 		q.back().setAttenuation(0.4);
+		q.back().setRelativeToListener(false);
 	} else {
 		q.back().setRelativeToListener(true);
 	}

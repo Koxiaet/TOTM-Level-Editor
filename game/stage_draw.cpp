@@ -212,7 +212,7 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 								}
 								goaly--;
 								vec_bullet.push_back(bullet(goalx, goaly, tempx, tempy, 90));
-								addToQueue(que_bullet_launch, snd_bullet_launch, sf::Vector3f(i*32 + 16, 0x0f, j*32 + 16));
+								addToQueue(que_bullet_launch, snd_bullet_launch, sf::Vector3f(i*32 + 16, 0.0f, j*32 + 16));
 							}
 							if (tiles[i][j].spikeTimerU > shootTimerMax) {
 								tiles[i][j].spikeTimerU = 0;
@@ -240,7 +240,7 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 								}
 								goalx++;
 								vec_bullet.push_back(bullet(goalx, goaly, tempx, tempy, 180));
-								addToQueue(que_bullet_launch, snd_bullet_launch, sf::Vector3f(i*32 + 16, 0x0f, j*32 + 16));
+								addToQueue(que_bullet_launch, snd_bullet_launch, sf::Vector3f(i*32 + 16, 0.0f, j*32 + 16));
 							}
 							if (tiles[i][j].spikeTimerU > shootTimerMax) {
 								tiles[i][j].spikeTimerU = 0;
@@ -268,12 +268,15 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 								}
 								goalx--;
 								vec_bullet.push_back(bullet(goalx, goaly, tempx, tempy, 0));
-								addToQueue(que_bullet_launch, snd_bullet_launch, sf::Vector3f(i*32 + 16, 0x0f, j*32 + 16));
+								addToQueue(que_bullet_launch, snd_bullet_launch, sf::Vector3f(i*32 + 16, 0.0f, j*32 + 16));
 							}
 							if (tiles[i][j].spikeTimerU > shootTimerMax) {
 								tiles[i][j].spikeTimerU = 0;
 							}
 						}
+						break;
+					case breakableBlock:
+						drawTile(window, spr_breakableBlock, i, j);
 						break;
 				}
 			}
@@ -331,6 +334,9 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 					break;
 				case shooter_right:
 					drawPreviewTile(window, spr_shooter_right, previewx, previewy);
+					break;
+				case breakableBlock:
+					drawPreviewTile(window, spr_breakableBlock, previewx, previewy);
 					break;
 			}
 
@@ -402,6 +408,7 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 		manageQueue(que_blade, sf::Vector3f(player.tempx, 0.0f, player.tempy));
 		manageQueue(que_bullet_launch, sf::Vector3f(player.tempx, 0.0f, player.tempy));
 		manageQueue(que_coin);
+		manageQueue(que_breakableBlock);
 	}
 
 	window.setView(sf::View(sf::FloatRect(0, 0, window.getSize().x, window.getSize().y)));

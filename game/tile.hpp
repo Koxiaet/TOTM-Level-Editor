@@ -16,6 +16,8 @@ enum tiletypeEnum: uint8_t
 	shooter_down = 8,
 	shooter_left = 9,
 	shooter_right = 10,
+	breakableBlock = 11,
+	brokenBlock = 12
 };
 
 typedef uint8_t tiletype;
@@ -23,7 +25,8 @@ typedef uint8_t tiletype;
 enum collisionTypeEnum: uint8_t
 {
 	pass,
-	solid
+	solid,
+	breakable
 };
 
 typedef uint8_t collisionType;
@@ -63,6 +66,8 @@ public:
 			case shooter_down: return solid;
 			case shooter_left: return solid;
 			case shooter_right: return solid;
+			case breakableBlock: return breakable;
+			case brokenBlock: return pass;
 			default: return pass; //also error but nvm
 		}
 	}

@@ -167,6 +167,8 @@ void stage::killPlayer() //play mode
 		for (size_t j = 0; j < height; j++) {
 			if (tiles[i][j].type == ccoin) {
 				tiles[i][j].type = coin;
+			} else if (tiles[i][j].type == brokenBlock) {
+				tiles[i][j].type = breakableBlock;
 			}
 		}
 	}
@@ -260,6 +262,12 @@ stage::stage():
 	spr_shooter_open_right.setScale(sf::Vector2f(-2.0f, 2.0f));
 	spr_shooter_open_right.setOrigin(8, 8);
 
+	tex_breakableBlock.loadFromFile("game/images/breakableBlock.png");
+	tex_breakableBlock.setSmooth(false);
+	spr_breakableBlock.setTexture(tex_breakableBlock);
+	spr_breakableBlock.setScale(sf::Vector2f(2.0f, 2.0f));
+	spr_breakableBlock.setOrigin(8, 8);
+
 	tex_bullet.loadFromFile("game/images/bullet.png");
 	tex_bullet.setSmooth(false);
 	spr_bullet.setTexture(tex_bullet);
@@ -283,6 +291,9 @@ stage::stage():
 
 	buf_blade.loadFromFile("game/sounds/blade.ogg");
 	snd_blade.setBuffer(buf_blade);
+
+	buf_breakableBlock = squareWave(210, 2, 2000);
+	snd_breakableBlock.setBuffer(buf_breakableBlock);
 
 	fnt_totm.loadFromFile("totm.ttf");
 	txt_coins.setFont(fnt_totm);
@@ -316,6 +327,7 @@ stage::stage():
 	panel.items.push_back(panelItem(&spr_spikes, "SPIKES", 4));
 	panel.items.push_back(panelItem(&spr_spikeHider, "HIDDEN SPIKES", 5));
 	panel.items.push_back(panelItem(&spr_player, "PLAYER", 6));
+	panel.items.push_back(panelItem(&spr_breakableBlock, "BREAKABLE BLOCK", 11));
 	panel.items.push_back(panelItem(&spr_shooter_up, "SHOOTER UP", 7));
 	panel.items.push_back(panelItem(&spr_shooter_down, "SHOOTER DOWN", 8));
 	panel.items.push_back(panelItem(&spr_shooter_left, "SHOOTER LEFT", 9));
@@ -366,8 +378,10 @@ void stage::controlPlayer() //play mode
 	if (player.x*32+16 == player.tempx && player.y*32+16 == player.tempy) {
 		if (key(Up)) {
 			size_t dy = 0;
-			while (tiles[player.x][player.y-dy].getCollisionType() == pass) {
+			collisionType collision = tiles[player.x][player.y-dy].getCollisionType();
+			while (collision == pass || collision == breakable) {
 				dy++;
+				collision = tiles[player.x][player.y-dy].getCollisionType();
 			}
 			player.y -= --dy;
 			if (dy > 0) {
@@ -378,8 +392,10 @@ void stage::controlPlayer() //play mode
 			player.facing = up;
 		} else if (key(Down)) {
 			size_t dy = 0;
-			while (tiles[player.x][player.y+dy].getCollisionType() == pass) {
+			collisionType collision = tiles[player.x][player.y+dy].getCollisionType();
+			while (collision == pass || collision == breakable) {
 				dy++;
+				collision = tiles[player.x][player.y+dy].getCollisionType();
 			}
 			player.y += --dy;
 			if (dy > 0) {
@@ -390,8 +406,10 @@ void stage::controlPlayer() //play mode
 			player.facing = down;
 		} else if (key(Right)) {
 			size_t dx = 0;
-			while (tiles[player.x+dx][player.y].getCollisionType() == pass) {
+			collisionType collision = tiles[player.x+dx][player.y].getCollisionType();
+			while (collision == pass || collision == breakable) {
 				dx++;
+				collision = tiles[player.x+dx][player.y].getCollisionType();
 			}
 			player.x += --dx;
 			if (dx > 0) {
@@ -402,8 +420,10 @@ void stage::controlPlayer() //play mode
 			player.facing = right;
 		} else if (key(Left)) {
 			size_t dx = 0;
-			while (tiles[player.x-dx][player.y].getCollisionType() == pass) {
+			collisionType collision = tiles[player.x-dx][player.y].getCollisionType();
+			while (collision == pass || collision == breakable) {
 				dx++;
+				collision = tiles[player.x-dx][player.y].getCollisionType();
 			}
 			player.x -= --dx;
 			if (dx > 0) {
@@ -485,6 +505,15 @@ void stage::controlPlayer() //play mode
 	}
 	if (tiles[tempxtmax+1][tempytmax].spikeTimerL > spikeTimerMin && tiles[tempxtmin+1][tempytmin].type == spikes) {
 		killPlayer();
+	}
+
+	if (tiles[tempxtmin][tempytmin].type == breakableBlock) {
+		tiles[tempxtmin][tempytmin].type = brokenBlock;
+		addToQueue(que_breakableBlock, snd_breakableBlock);
+	}
+	if (tiles[tempxtmax][tempytmax].type == breakableBlock) {
+		tiles[tempxtmax][tempytmax].type = brokenBlock;
+		addToQueue(que_breakableBlock, snd_breakableBlock);
 	}
 
 	if (key(R)) {

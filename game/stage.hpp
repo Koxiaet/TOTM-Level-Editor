@@ -58,6 +58,9 @@ protected:
 	sf::Sprite  spr_shooter_open_left;
 	sf::Sprite  spr_shooter_open_right;
 
+	sf::Texture tex_breakableBlock;
+	sf::Sprite  spr_breakableBlock;
+
 	sf::Texture tex_bullet;
 	sf::Sprite  spr_bullet;
 	std::vector<bullet> vec_bullet;
@@ -79,6 +82,10 @@ protected:
 	sf::SoundBuffer       buf_bullet_launch; //play mode
 	sf::Sound             snd_bullet_launch; //play mode
 	std::queue<sf::Sound> que_bullet_launch; //play mode
+
+	sf::SoundBuffer       buf_breakableBlock; //play mode
+	sf::Sound             snd_breakableBlock; //play mode
+	std::queue<sf::Sound> que_breakableBlock; //play mode
 
 	sf::Font fnt_totm;
 	sf::Text txt_coins; //play mode
