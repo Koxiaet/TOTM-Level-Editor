@@ -278,6 +278,9 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 					case breakableBlock:
 						drawTile(window, spr_breakableBlock, i, j);
 						break;
+					case goal:
+						drawTile(window, spr_goal, i, j);
+						break;
 				}
 			}
 		}
@@ -338,6 +341,9 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 				case breakableBlock:
 					drawPreviewTile(window, spr_breakableBlock, previewx, previewy);
 					break;
+				case goal:
+					drawPreviewTile(window, spr_goal, previewx, previewy);
+					break;
 			}
 
 			if ((mouse(Left) || mouse(Right)) && !disableClick) {
@@ -388,24 +394,26 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 			}
 		}
 	} else {
-		if (player.recovering%24 >= 0 && player.recovering%24 < 12) {
-			spr_player.setPosition(player.tempx, player.tempy);
-			switch (player.facing) {
-				case up:    spr_player.setRotation(180); break;
-				case down:  spr_player.setRotation(0);   break;
-				case left:  spr_player.setRotation(90);  break;
-				case right: spr_player.setRotation(270); break;
+ 		if (!win) { //don't draw player if in win mode
+			if (player.recovering%24 >= 0 && player.recovering%24 < 12) {
+				spr_player.setPosition(player.tempx, player.tempy);
+				switch (player.facing) {
+					case up:    spr_player.setRotation(180); break;
+					case down:  spr_player.setRotation(0);   break;
+					case left:  spr_player.setRotation(90);  break;
+					case right: spr_player.setRotation(270); break;
+				}
+				window.draw(spr_player);
 			}
-			window.draw(spr_player);
-		}
-		if (player.recovering > 0) {
-			player.recovering++;
-			if (player.recovering >= 240) {
-				player.recovering = 0;
+			if (player.recovering > 0) {
+				player.recovering++;
+				if (player.recovering >= 240) {
+					player.recovering = 0;
+				}
 			}
 		}
 
-		sf::Listener::setPosition(sf::Vector3f(player.tempx, 0.0f, player.tempy));
+			sf::Listener::setPosition(sf::Vector3f(player.tempx, 0.0f, player.tempy));
 
 		manageQueue(que_blade);
 		manageQueue(que_bullet_launch);
@@ -440,4 +448,32 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 
 	spr_pause.setPosition(window.getSize().x, 0);
 	window.draw(spr_pause);
+
+	if (win) { //if you win, draw winning box
+		const uint barHeight = 16;
+		if (barTimer%10 < 5) {
+			bars.setPosition(0, 0);
+		} else {
+			bars.setPosition(0, barHeight);
+		}
+		barTimer++;
+		bars.setSize(sf::Vector2f(window.getSize().x, barHeight));
+		for (size_t i = 0; i < window.getSize().y/(barHeight*2); i++) {
+			window.draw(bars);
+			bars.move(0, barHeight*2);
+		}
+		sf::RectangleShape background;
+		background.setFillColor(sf::Color(255, 255, 0));
+		background.setSize(sf::Vector2f(150, 28));
+		background.setOrigin(background.getSize().x/2, background.getSize().y/2);
+		background.setPosition(window.getSize().x/2, window.getSize().y/2);
+		window.draw(background);
+		txt_you_win.setString("YOU WIN!");
+		txt_you_win.setOrigin(txt_you_win.getGlobalBounds().width/2, txt_you_win.getGlobalBounds().height/2);
+		txt_you_win.setPosition(window.getSize().x/2, window.getSize().y/2);
+		window.draw(txt_you_win);
+		if (mouse(Left) || key(Escape)) {
+			killPlayer();
+		}
+	}
 }

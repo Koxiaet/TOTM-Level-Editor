@@ -17,7 +17,8 @@ enum tiletypeEnum: uint8_t
 	shooter_left = 9,
 	shooter_right = 10,
 	breakableBlock = 11,
-	brokenBlock = 12
+	brokenBlock = 12,
+	goal = 13
 };
 
 typedef uint8_t tiletype;
@@ -68,6 +69,7 @@ public:
 			case shooter_right: return solid;
 			case breakableBlock: return breakable;
 			case brokenBlock: return pass;
+			case goal: return solid;
 			default: return pass; //also error but nvm
 		}
 	}

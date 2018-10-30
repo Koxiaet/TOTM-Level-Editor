@@ -61,6 +61,9 @@ protected:
 	sf::Texture tex_breakableBlock;
 	sf::Sprite  spr_breakableBlock;
 
+	sf::Texture tex_goal;
+	sf::Sprite  spr_goal;
+
 	sf::Texture tex_bullet;
 	sf::Sprite  spr_bullet;
 	std::vector<bullet> vec_bullet;
@@ -89,6 +92,7 @@ protected:
 
 	sf::Font fnt_totm;
 	sf::Text txt_coins; //play mode
+	sf::Text txt_you_win; //play mode
 
 	sf::Cursor cur_default; //edit mode
 	sf::Cursor cur_hand; //edit mode
@@ -97,6 +101,10 @@ protected:
 	panel panel; //edit mode
 
 	std::string openFileName; //edit mode
+
+	bool win; //play mode
+	uint barTimer; //play mode
+	sf::RectangleShape bars; //play mode
 
 	void dealloc();
 	void alloc();

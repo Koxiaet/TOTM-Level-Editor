@@ -172,6 +172,7 @@ void stage::killPlayer() //play mode
 			}
 		}
 	}
+	win = false;
 }
 
 stage::stage():
@@ -182,6 +183,8 @@ stage::stage():
 	scrolly(-300),
 	tiles(NULL),
 	openFileName("Untitled"),
+	win(false),
+	barTimer(0),
 	unsavedChanges(false)
 {
 	tex_coin.loadFromFile("game/images/coin.png");
@@ -268,6 +271,12 @@ stage::stage():
 	spr_breakableBlock.setScale(sf::Vector2f(2.0f, 2.0f));
 	spr_breakableBlock.setOrigin(8, 8);
 
+	tex_goal.loadFromFile("game/images/goal.png");
+	tex_goal.setSmooth(false);
+	spr_goal.setTexture(tex_goal);
+	spr_goal.setScale(sf::Vector2f(2.0f, 2.0f));
+	spr_goal.setOrigin(8, 8);
+
 	tex_bullet.loadFromFile("game/images/bullet.png");
 	tex_bullet.setSmooth(false);
 	spr_bullet.setTexture(tex_bullet);
@@ -300,6 +309,10 @@ stage::stage():
 	txt_coins.setCharacterSize(20);
 	txt_coins.setFillColor(sf::Color(0xFF, 0xFF, 0x00));
 
+	txt_you_win.setFont(fnt_totm);
+	txt_you_win.setCharacterSize(20);
+	txt_you_win.setFillColor(sf::Color(0,0,0));
+
 	menubar.items.push_back(menuSection("FILE"));
 	menubar.items[0].items.push_back(menuItem("NEW"));
 	menubar.items[0].items[0].shortcut.push_back(sf::Keyboard::LSystem);
@@ -321,17 +334,20 @@ stage::stage():
 	cur_default.loadFromSystem(sf::Cursor::Arrow);
 	cur_hand.loadFromSystem(sf::Cursor::Hand);
 
-	panel.items.push_back(panelItem("AIR", 0));
-	panel.items.push_back(panelItem(&spr_coin, "COIN", 1));
-	panel.items.push_back(panelItem(&spr_brick, "BRICK", 3));
-	panel.items.push_back(panelItem(&spr_spikes, "SPIKES", 4));
-	panel.items.push_back(panelItem(&spr_spikeHider, "HIDDEN SPIKES", 5));
-	panel.items.push_back(panelItem(&spr_player, "PLAYER", 6));
-	panel.items.push_back(panelItem(&spr_breakableBlock, "BREAKABLE BLOCK", 11));
-	panel.items.push_back(panelItem(&spr_shooter_up, "SHOOTER UP", 7));
-	panel.items.push_back(panelItem(&spr_shooter_down, "SHOOTER DOWN", 8));
-	panel.items.push_back(panelItem(&spr_shooter_left, "SHOOTER LEFT", 9));
-	panel.items.push_back(panelItem(&spr_shooter_right, "SHOOTER RIGHT", 10));
+	panel.items.push_back(panelItem("AIR", air));
+	panel.items.push_back(panelItem(&spr_coin, "COIN", coin));
+	panel.items.push_back(panelItem(&spr_brick, "BRICK", brick));
+	panel.items.push_back(panelItem(&spr_spikes, "SPIKES", spikes));
+	panel.items.push_back(panelItem(&spr_spikeHider, "HIDDEN SPIKES", spikeHider));
+	panel.items.push_back(panelItem(&spr_player, "PLAYER", tile_player));
+	panel.items.push_back(panelItem(&spr_breakableBlock, "BREAKABLE BLOCK", breakableBlock));
+	panel.items.push_back(panelItem(&spr_goal, "GOAL", goal));
+	panel.items.push_back(panelItem(&spr_shooter_up, "SHOOTER UP", shooter_up));
+	panel.items.push_back(panelItem(&spr_shooter_down, "SHOOTER DOWN", shooter_down));
+	panel.items.push_back(panelItem(&spr_shooter_left, "SHOOTER LEFT", shooter_left));
+	panel.items.push_back(panelItem(&spr_shooter_right, "SHOOTER RIGHT", shooter_right));
+
+	bars.setFillColor(sf::Color(0,0,0));
 }
 
 size_t stage::getWidth()
@@ -373,6 +389,9 @@ void stage::scroll(sf::RenderWindow& window) //edit mode
 void stage::controlPlayer() //play mode
 {
 	if (editMode) {
+		return;
+	}
+	if (win) {
 		return;
 	}
 	if (player.x*32+16 == player.tempx && player.y*32+16 == player.tempy) {
@@ -463,6 +482,9 @@ void stage::controlPlayer() //play mode
 		if (standingOn().type == spikes) { //if dies
 			killPlayer();
 		}
+		if (standingOn().type == goal) { //if wins
+			win = true;
+		}
 	}
 	const size_t tempxtmin = (player.tempx-16)/32;
 	const size_t tempytmin = (player.tempy-16)/32;
@@ -481,29 +503,29 @@ void stage::controlPlayer() //play mode
 		addToQueue(que_coin, snd_coin);
 	}
 
-	if (tiles[tempxtmin][tempytmin-1].spikeTimerD > spikeTimerMin && tiles[tempxtmin][tempytmin-1].type == spikes) {
+	if (tiles[tempxtmin][tempytmin-1].spikeTimerD > spikeTimerMin && tiles[tempxtmin][tempytmin-1].type == spikeHider) {
 		killPlayer();
 	}
-	if (tiles[tempxtmin][tempytmin+1].spikeTimerU > spikeTimerMin && tiles[tempxtmin][tempytmin+1].type == spikes) {
+	if (tiles[tempxtmin][tempytmin+1].spikeTimerU > spikeTimerMin && tiles[tempxtmin][tempytmin+1].type == spikeHider) {
 		killPlayer();
 	}
-	if (tiles[tempxtmin-1][tempytmin].spikeTimerR > spikeTimerMin && tiles[tempxtmin-1][tempytmin].type == spikes) {
+	if (tiles[tempxtmin-1][tempytmin].spikeTimerR > spikeTimerMin && tiles[tempxtmin-1][tempytmin].type == spikeHider) {
 		killPlayer();
 	}
-	if (tiles[tempxtmin+1][tempytmin].spikeTimerL > spikeTimerMin && tiles[tempxtmin+1][tempytmin].type == spikes) {
+	if (tiles[tempxtmin+1][tempytmin].spikeTimerL > spikeTimerMin && tiles[tempxtmin+1][tempytmin].type == spikeHider) {
 		killPlayer();
 	}
 	
-	if (tiles[tempxtmax][tempytmax-1].spikeTimerD > spikeTimerMin && tiles[tempxtmin][tempytmin-1].type == spikes) {
+	if (tiles[tempxtmax][tempytmax-1].spikeTimerD > spikeTimerMin && tiles[tempxtmin][tempytmin-1].type == spikeHider) {
 		killPlayer();
 	}
-	if (tiles[tempxtmax][tempytmax+1].spikeTimerU > spikeTimerMin && tiles[tempxtmin][tempytmin+1].type == spikes) {
+	if (tiles[tempxtmax][tempytmax+1].spikeTimerU > spikeTimerMin && tiles[tempxtmin][tempytmin+1].type == spikeHider) {
 		killPlayer();
 	}
-	if (tiles[tempxtmax-1][tempytmax].spikeTimerR > spikeTimerMin && tiles[tempxtmin-1][tempytmin].type == spikes) {
+	if (tiles[tempxtmax-1][tempytmax].spikeTimerR > spikeTimerMin && tiles[tempxtmin-1][tempytmin].type == spikeHider) {
 		killPlayer();
 	}
-	if (tiles[tempxtmax+1][tempytmax].spikeTimerL > spikeTimerMin && tiles[tempxtmin+1][tempytmin].type == spikes) {
+	if (tiles[tempxtmax+1][tempytmax].spikeTimerL > spikeTimerMin && tiles[tempxtmin+1][tempytmin].type == spikeHider) {
 		killPlayer();
 	}
 
@@ -525,6 +547,7 @@ void stage::changeToEditMode()
 {
 	killPlayer();
 	editMode = true;
+	spr_player.setRotation(0);
 }
 
 int  stage::changeToPlayMode()
