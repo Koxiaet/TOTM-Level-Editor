@@ -8,16 +8,24 @@
 #include <SFML/Audio.hpp>
 #include <string>
 #include <queue>
+#include "../colors.hpp"
 
 #ifndef __KAI__TOTM__STAGE__
 #define __KAI__TOTM__STAGE__ 1
 
 #define key(x) sf::Keyboard::isKeyPressed(sf::Keyboard::x)
 
+enum stageModeEnum
+{
+	playing,
+	editing,
+	undefined
+};
+
 class stage
 {
 protected:
-	bool editMode; //playing or editing?
+	uint mode; //playing; editing; undefined
 	size_t width;
 	size_t height;
 	sf::Vector2i oldMousePos; //for edit mode: moving camera around with middle click
@@ -45,6 +53,8 @@ protected:
 
 	sf::Texture tex_player;
 	sf::Sprite  spr_player;
+	sf::Texture tex_player_moving;
+	sf::Sprite  spr_player_moving;
 
 	sf::Texture tex_shooter;
 	sf::Sprite  spr_shooter_up;
@@ -105,6 +115,9 @@ protected:
 	bool win; //play mode
 	uint barTimer; //play mode
 	sf::RectangleShape bars; //play mode
+
+	uint colorTimer;
+	void updateColors();
 
 	void dealloc();
 	void alloc();

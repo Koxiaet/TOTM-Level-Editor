@@ -6,9 +6,9 @@ menubar::menubar(): menuOpen(SIZE_MAX), oldMouseLeft(false)
 {
 	totm.loadFromFile("totm.ttf");
 	text.setFont(totm);
-	text.setFillColor(sf::Color(0xFF, 0xFF, 0x00));
+	text.setFillColor(COL_MED);
 	text.setCharacterSize(20);
-	highlight.setFillColor(sf::Color(0xFF,0xFF,0));
+	highlight.setFillColor(COL_MED);
 }
 
 void menubar::draw(sf::RenderWindow& window)
@@ -19,7 +19,7 @@ void menubar::draw(sf::RenderWindow& window)
 
 	sf::RectangleShape barbkg;
 	barbkg.setSize(sf::Vector2f(window.getSize().x - loffset, 20 + 2*padding));
-	barbkg.setFillColor(sf::Color(0,0,0));
+	barbkg.setFillColor(COL_NONE);
 	barbkg.setPosition(loffset, 0);
 	window.draw(barbkg);
 

@@ -26,9 +26,9 @@ void menuSection::draw(sf::RenderWindow& window, uint& offset, const uint spacin
 
 	if (menuOpen) {
 		window.draw(highlight);
-		text.setFillColor(sf::Color(0, 0, 0));
+		text.setFillColor(COL_NONE);
 	} else {
-		text.setFillColor(sf::Color(0xFF, 0xFF, 0));
+		text.setFillColor(COL_MED);
 	}
 	window.draw(text);
 	offset += text.getGlobalBounds().width;
@@ -46,7 +46,7 @@ void menuSection::draw(sf::RenderWindow& window, uint& offset, const uint spacin
 			items[i].getDimsName(currentWidth, currentHeight, vpadding, text);	
 		}
 		sf::RectangleShape bkg;
-		bkg.setFillColor(sf::Color(0, 0, 0));
+		bkg.setFillColor(COL_NONE);
 		bkg.setPosition(loffset, toffset);
 		bkg.setSize(sf::Vector2f(currentWidth + 2*hpadding, currentHeight));
 		window.draw(bkg);

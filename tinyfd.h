@@ -136,7 +136,7 @@ for graphic mode:
 for console mode:
   dialog whiptail basicinput no_solution */
 
-enum tinyfd_yesnocancel: int
+enum tinyfd_yesnocancel
 {
 	tinyfd_yes = 1,
 	tinyfd_no = 2,

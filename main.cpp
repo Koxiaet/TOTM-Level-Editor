@@ -1,3 +1,5 @@
+#include "colors.hpp"
+
 #include "game/stage.hpp"
 #include "title/title.hpp"
 
@@ -6,6 +8,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "tinyfd.h"
+#include "rand.hpp"
 
 #define key(x)   sf::Keyboard::isKeyPressed(sf::Keyboard::x)
 #define mouse(x) sf::Mouse::isButtonPressed(sf::Mouse::x)
@@ -21,6 +24,8 @@ typedef enum modetype modetype;
 
 int main()
 {
+	srand(time(NULL));
+	r.reseed(time(NULL));
 	chdir("/Users/riejewson/Desktop/Kai/Coding/C++/totm/app/Contents/MacOS");
 
 	modetype mode = mode_title; //0 is title, 1 is game, 2 is edit
@@ -51,13 +56,16 @@ int main()
 			if (e.type == sf::Event::GainedFocus) {
 				focused = true;
 			}
+			if (e.type == sf::Event::Resized) {
+				titleScreen.resize(window);
+			}
 		}
-		window.clear(sf::Color::Black);
+		window.clear(COL_NONE);
 
 		if (focused) {
 			switch (mode) {
 				case mode_title:
-					switch (titleScreen.testClicked(window)) {
+					switch (titleScreen.testClicked()) {
 						case editButton:
 							mode = mode_edit;
 							disableClick = true;

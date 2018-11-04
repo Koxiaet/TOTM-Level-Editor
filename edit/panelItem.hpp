@@ -1,5 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <string>
+#include "../colors.hpp"
+
 
 #ifndef __KAI__TOTM__PANELITEM__
 #define __KAI__TOTM__PANELITEM__ 1

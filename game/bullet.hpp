@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include "../colors.hpp"
 
 #ifndef __KAI__TOTM__BULLET__
 #define __KAI__TOTM__BULLET__ 1

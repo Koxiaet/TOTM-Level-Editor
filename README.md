@@ -10,10 +10,7 @@ You must have [SFML 2.5.1](https://www.sfml-dev.org/download/sfml/2.5.1/) and g+
 
 ### Building
 
-run:
-g++ -o TOTM title/title.cpp tinyfd.o game/stage.cpp game/soundGenerator.cpp game/player.cpp game/stage_draw.cpp game/files.cpp game/queue.cpp game/bullet.cpp edit/panel.cpp edit/menu/menuSection.cpp edit/menu/menubar.cpp edit/menu/menuItem.cpp main.cpp lsfml-system -lsfml-window -lsfml-graphics -lsfml-audio -lsfml-network 
-
-This will create an executable 'TOTM', which you can execute.
+Compile using all the .cpp and .c files.
 
 ## Built With
 
@@ -33,4 +30,4 @@ This will create an executable 'TOTM', which you can execute.
 
 ## Acknowledgments
 
-* Playgendary made the original game, so play it if you haven't already
+* Playgendary, happymagenta and shelzy made the original game, so play it if you haven't already

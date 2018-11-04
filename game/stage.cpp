@@ -176,7 +176,7 @@ void stage::killPlayer() //play mode
 }
 
 stage::stage():
-	editMode(false),
+	mode(undefined),
 	width(0),
 	height(0),
 	scrollx(-400),
@@ -185,49 +185,67 @@ stage::stage():
 	openFileName("Untitled"),
 	win(false),
 	barTimer(0),
+	colorTimer(0),
 	unsavedChanges(false)
+	
 {
 	tex_coin.loadFromFile("game/images/coin.png");
 	tex_coin.setSmooth(false);
 	spr_coin.setTexture(tex_coin);
 	spr_coin.setScale(sf::Vector2f(2.0f, 2.0f));
 	spr_coin.setOrigin(8, 8);
+	spr_coin.setColor(COL_MED);
 
 	tex_brick.loadFromFile("game/images/brick.png");
 	tex_brick.setSmooth(false);
 	spr_brick.setTexture(tex_brick);
 	spr_brick.setScale(sf::Vector2f(2.0f, 2.0f));
 	spr_brick.setOrigin(8, 8);
+	spr_brick.setColor(COL_LOW);
 
 	tex_spikes.loadFromFile("game/images/spikes.png");
 	tex_spikes.setSmooth(false);
 	spr_spikes.setTexture(tex_spikes);
 	spr_spikes.setScale(sf::Vector2f(2.0f, 2.0f));
 	spr_spikes.setOrigin(8, 8);
+	spr_spikes.setColor(COL_HIGH);
 
 	tex_spikeHider.loadFromFile("game/images/spikeHider.png");
 	tex_spikeHider.setSmooth(false);
 	spr_spikeHider.setTexture(tex_spikeHider);
 	spr_spikeHider.setScale(sf::Vector2f(2.0f, 2.0f));
 	spr_spikeHider.setOrigin(8, 8);
+	spr_spikeHider.setColor(COL_LOW);
 
 	tex_smallHiddenSpikes.loadFromFile("game/images/smallHiddenSpikes.png");
 	tex_smallHiddenSpikes.setSmooth(false);
 	spr_smallHiddenSpikes.setTexture(tex_smallHiddenSpikes);
 	spr_smallHiddenSpikes.setScale(sf::Vector2f(2.0f, 2.0f));
 	spr_smallHiddenSpikes.setOrigin(8, 8);
+	spr_smallHiddenSpikes.setColor(COL_HIGH);
 
 	tex_hiddenSpikes.loadFromFile("game/images/hiddenSpikes.png");
 	tex_hiddenSpikes.setSmooth(false);
 	spr_hiddenSpikes.setTexture(tex_hiddenSpikes);
 	spr_hiddenSpikes.setScale(sf::Vector2f(2.0f, 2.0f));
 	spr_hiddenSpikes.setOrigin(8, 8);
+	spr_hiddenSpikes.setColor(COL_HIGH);
 
 	tex_player.loadFromFile("game/images/player.png");
 	tex_player.setSmooth(false);
 	spr_player.setTexture(tex_player);
+	spr_player.setTextureRect(sf::IntRect(0, 0, 16, 16));
 	spr_player.setScale(sf::Vector2f(2.0f, 2.0f));
 	spr_player.setOrigin(8, 8);
+	spr_player.setColor(COL_MED);
+
+	tex_player_moving.loadFromFile("game/images/playerMoving.png");
+	tex_player_moving.setSmooth(false);
+	spr_player_moving.setTexture(tex_player_moving);
+	spr_player_moving.setTextureRect(sf::IntRect(0, 0, 16, 16));
+	spr_player_moving.setScale(sf::Vector2f(2.0f, 2.0f));
+	spr_player_moving.setOrigin(8, 8);
+	spr_player_moving.setColor(COL_MED);
 
 	tex_shooter.loadFromFile("game/images/shooter.png");
 	tex_shooter.setSmooth(false);
@@ -235,17 +253,21 @@ stage::stage():
 	spr_shooter_up.setScale(sf::Vector2f(2.0f, 2.0f));
 	spr_shooter_up.setOrigin(8, 8);
 	spr_shooter_up.setRotation(90);
+	spr_shooter_up.setColor(COL_LOW);
 	spr_shooter_down.setTexture(tex_shooter);
 	spr_shooter_down.setScale(sf::Vector2f(-2.0f, 2.0f));
 	spr_shooter_down.setOrigin(8, 8);
 	spr_shooter_down.setRotation(90);
+	spr_shooter_down.setColor(COL_LOW);
 	spr_shooter_left.setTexture(tex_shooter);
 	spr_shooter_left.setScale(sf::Vector2f(2.0f, 2.0f));
 	spr_shooter_left.setOrigin(8, 8);
 	spr_shooter_left.setRotation(0);
+	spr_shooter_left.setColor(COL_LOW);
 	spr_shooter_right.setTexture(tex_shooter);
 	spr_shooter_right.setScale(sf::Vector2f(-2.0f, 2.0f));
 	spr_shooter_right.setOrigin(8, 8);
+	spr_shooter_right.setColor(COL_LOW);
 
 	tex_shooter_open.loadFromFile("game/images/shooterOpen.png");
 	tex_shooter_open.setSmooth(false);
@@ -253,41 +275,49 @@ stage::stage():
 	spr_shooter_open_up.setScale(sf::Vector2f(2.0f, 2.0f));
 	spr_shooter_open_up.setOrigin(8, 8);
 	spr_shooter_open_up.setRotation(90);
+	spr_shooter_open_up.setColor(COL_HIGH);
 	spr_shooter_open_down.setTexture(tex_shooter_open);
 	spr_shooter_open_down.setScale(sf::Vector2f(-2.0f, 2.0f));
 	spr_shooter_open_down.setOrigin(8, 8);
 	spr_shooter_open_down.setRotation(90);
+	spr_shooter_open_down.setColor(COL_HIGH);
 	spr_shooter_open_left.setTexture(tex_shooter_open);
 	spr_shooter_open_left.setScale(sf::Vector2f(2.0f, 2.0f));
 	spr_shooter_open_left.setOrigin(8, 8);
 	spr_shooter_open_left.setRotation(0);
+	spr_shooter_open_left.setColor(COL_HIGH);
 	spr_shooter_open_right.setTexture(tex_shooter_open);
 	spr_shooter_open_right.setScale(sf::Vector2f(-2.0f, 2.0f));
 	spr_shooter_open_right.setOrigin(8, 8);
+	spr_shooter_open_right.setColor(COL_HIGH);
 
 	tex_breakableBlock.loadFromFile("game/images/breakableBlock.png");
 	tex_breakableBlock.setSmooth(false);
 	spr_breakableBlock.setTexture(tex_breakableBlock);
 	spr_breakableBlock.setScale(sf::Vector2f(2.0f, 2.0f));
 	spr_breakableBlock.setOrigin(8, 8);
+	spr_breakableBlock.setColor(COL_LOW);
 
 	tex_goal.loadFromFile("game/images/goal.png");
 	tex_goal.setSmooth(false);
 	spr_goal.setTexture(tex_goal);
 	spr_goal.setScale(sf::Vector2f(2.0f, 2.0f));
 	spr_goal.setOrigin(8, 8);
+	spr_goal.setColor(COL_MED);
 
 	tex_bullet.loadFromFile("game/images/bullet.png");
 	tex_bullet.setSmooth(false);
 	spr_bullet.setTexture(tex_bullet);
 	spr_bullet.setScale(sf::Vector2f(2.0f, 2.0f));
 	spr_bullet.setOrigin(8, 8);
+	spr_bullet.setColor(COL_HIGH);
 
 	tex_pause.loadFromFile("game/images/pauseIcon.png");
 	tex_pause.setSmooth(false);
 	spr_pause.setTexture(tex_pause);
 	spr_pause.setOrigin(8, 0);
 	spr_pause.setScale(sf::Vector2f(4.0f, 4.0f));
+	spr_pause.setColor(COL_MED);
 
 	buf_move = squareWave(105, 6, 2000);
 	snd_move.setBuffer(buf_move);
@@ -307,11 +337,11 @@ stage::stage():
 	fnt_totm.loadFromFile("totm.ttf");
 	txt_coins.setFont(fnt_totm);
 	txt_coins.setCharacterSize(20);
-	txt_coins.setFillColor(sf::Color(0xFF, 0xFF, 0x00));
+	txt_coins.setFillColor(COL_MED);
 
 	txt_you_win.setFont(fnt_totm);
 	txt_you_win.setCharacterSize(20);
-	txt_you_win.setFillColor(sf::Color(0,0,0));
+	txt_you_win.setFillColor(COL_NONE);
 
 	menubar.items.push_back(menuSection("FILE"));
 	menubar.items[0].items.push_back(menuItem("NEW"));
@@ -347,7 +377,7 @@ stage::stage():
 	panel.items.push_back(panelItem(&spr_shooter_left, "SHOOTER LEFT", shooter_left));
 	panel.items.push_back(panelItem(&spr_shooter_right, "SHOOTER RIGHT", shooter_right));
 
-	bars.setFillColor(sf::Color(0,0,0));
+	bars.setFillColor(COL_NONE);
 }
 
 size_t stage::getWidth()
@@ -388,13 +418,15 @@ void stage::scroll(sf::RenderWindow& window) //edit mode
 
 void stage::controlPlayer() //play mode
 {
-	if (editMode) {
+	if (mode != playing) {
 		return;
 	}
 	if (win) {
 		return;
 	}
-	if (player.x*32+16 == player.tempx && player.y*32+16 == player.tempy) {
+	if (player.x*32+16 == player.tempx && player.y*32+16 == player.tempy) { //if player is not moving
+		player.oldx = player.x;
+		player.oldy = player.y;
 		if (key(Up)) {
 			size_t dy = 0;
 			collisionType collision = tiles[player.x][player.y-dy].getCollisionType();
@@ -456,12 +488,24 @@ void stage::controlPlayer() //play mode
 		const size_t speed = 32;
 		if (player.tempx < player.x*32+16) {
 			player.tempx += speed;
+			if (player.tempx > player.x*32+16) {
+				player.tempx = player.x*32+16;
+			}
 		} else if (player.tempx > player.x*32+16) {
 			player.tempx -= speed;
+			if (player.tempx < player.x*32+16) {
+				player.tempx = player.x*32+16;
+			}
 		} else if (player.tempy < player.y*32+16) {
 			player.tempy += speed;
+			if (player.tempy > player.y*32+16) {
+				player.tempy = player.y*32+16;
+			}
 		} else if (player.tempy > player.y*32+16) {
 			player.tempy -= speed;
+			if (player.tempy < player.y*32+16) {
+				player.tempy = player.y*32+16;
+			}
 		}
 		const size_t tempxt = (player.tempx-16)/32;
 		const size_t tempyt = (player.tempy-16)/32;
@@ -545,37 +589,42 @@ void stage::controlPlayer() //play mode
 
 void stage::changeToEditMode()
 {
-	killPlayer();
-	editMode = true;
-	spr_player.setRotation(0);
+	if (mode != editing) {
+		killPlayer();
+		mode = editing;
+		spr_player.setRotation(0);
+	}
 }
 
 int  stage::changeToPlayMode()
 {
-	if (tiles == NULL) {
-		if (open() == 1) { //failed to open
-			return 1;
-		}
-	}
-	editMode = false;
-	uint changedPlayerPos = 0;
-	for (size_t i = 0; i < width; i++) {
-		for (size_t j = 0; j < height; j++) {
-			if (tiles[i][j].type == tile_player) {
-				player.teleport(i, j, down, true);
-				changedPlayerPos++;
+	if (mode != playing) {
+		if (tiles == NULL) {
+			if (open() == 1) { //failed to open
+				return 1;
 			}
 		}
-	}
+		mode = playing;
+		uint changedPlayerPos = 0;
+		for (size_t i = 0; i < width; i++) {
+			for (size_t j = 0; j < height; j++) {
+				if (tiles[i][j].type == tile_player) {
+					player.teleport(i, j, down, true);
+					changedPlayerPos++;
+				}
+			}
+		}
 
-	if (changedPlayerPos == 0) { //no player
-		std::cout << "Error: No Player." << std::endl;
-		return 1;
-	}
-	if (changedPlayerPos > 1) {
-		std::cout << "Warning: More than one player." << std::endl;
-	}
+		if (changedPlayerPos == 0) { //no player
+			std::cout << "Error: No Player." << std::endl;
+			return 1;
+		}
+		if (changedPlayerPos > 1) {
+			std::cout << "Warning: More than one player." << std::endl;
+		}
 
+		return 0;
+	}
 	return 0;
 }
 

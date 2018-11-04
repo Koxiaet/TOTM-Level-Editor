@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdint>
+#include <climits>
 
 void stage::drawTile(sf::RenderWindow& window, sf::Sprite& tile, const size_t i, const size_t j)
 {
@@ -13,13 +14,10 @@ void stage::drawTile(sf::RenderWindow& window, sf::Sprite& tile, const size_t i,
 
 void stage::drawPreviewTile(sf::RenderWindow& window, sf::Sprite& tile, const int previewx, const int previewy) //edit mode
 {
-	const sf::Color normal       = sf::Color(0xFF, 0xFF, 0xFF, 0xFF);
-	const sf::Color transparency = sf::Color(0xFF, 0xFF, 0xFF, 0xA0);
-
 	tile.setPosition(previewx, previewy);
-	tile.setColor(transparency);
+	tile.setColor(COL_TILE_TRANSLUCENT);
 	window.draw(tile);
-	tile.setColor(normal);
+	tile.setColor(COL_TILE_NORMAL);
 }
 
 void stage::updateBullets(sf::RenderWindow& window)
@@ -35,13 +33,42 @@ void stage::updateBullets(sf::RenderWindow& window)
 	}
 }
 
+void stage::updateColors()
+{
+	if (colorTimer == 0) {
+		spr_coin.setColor(COL_LOW);
+		spr_spikeHider.setColor(COL_LOW);
+		spr_breakableBlock.setColor(COL_LOW);
+		spr_goal.setColor(COL_MED);
+	} else if (colorTimer == 15) {
+		spr_coin.setColor(COL_LOWMED);
+		spr_spikeHider.setColor(COL_LOWHIGH);
+		spr_breakableBlock.setColor(COL_LOWMED);
+		spr_goal.setColor(COL_LOWMED);
+	} else if (colorTimer == 20) {
+		spr_coin.setColor(COL_MED);
+		spr_spikeHider.setColor(COL_HIGH);
+		spr_breakableBlock.setColor(COL_MED);
+		spr_goal.setColor(COL_LOW);
+	} else if (colorTimer == 25) {
+		spr_coin.setColor(COL_LOWMED);
+		spr_spikeHider.setColor(COL_LOWHIGH);
+		spr_breakableBlock.setColor(COL_LOWMED);
+		spr_goal.setColor(COL_LOWMED);
+	} else if (colorTimer == 29) {
+		colorTimer = UINT_MAX;
+	}
+	colorTimer++;
+}
+
 void stage::draw(sf::RenderWindow& window, bool disableClick)
 {
+	updateColors();
 	sf::View view(sf::FloatRect(0, 0, window.getSize().x, window.getSize().y));
 
-	//this manages the title, scrolling and view moving for edit and play mode respectively
+	//this manages the title, scrolling and view moving for both, edit, and play mode respectively
 	//if in play mode and no stage is open, open one
-	if (editMode) {
+	if (mode == editing) {
 		if (unsavedChanges) {
 			window.setTitle("*" + getName(openFileName) + " - TOTM Editor*");
 		} else {
@@ -50,9 +77,9 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 		
 		scroll(window);
 		view.setCenter(scrollx + (int)window.getSize().x/2, scrolly + (int)window.getSize().y/2);
-	} else {
+	} else if (mode == playing) {
 		window.setTitle("Tomb of the Mask");
-		view.setCenter(player.tempx, player.tempy);
+		view.setCenter(player.getScroll());
 	}
 
 	window.setMouseCursor(cur_default);
@@ -159,14 +186,14 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 						break;
 					}
 					case tile_player:
-						if (editMode) {
+						if (mode == editing) {
 							drawTile(window, spr_player, i, j);
 						}
 						break;
 					case shooter_up:
-						if (editMode) {
+						if (mode == editing) {
 							drawTile(window, spr_shooter_up, i, j);
-						} else {
+						} else if (mode == playing) {
 							tiles[i][j].spikeTimerU++;
 							if (tiles[i][j].spikeTimerU >= shootTimerMax-shootAnimMax) {
 								drawTile(window, spr_shooter_open_up, i, j);
@@ -192,9 +219,9 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 						}
 						break;
 					case shooter_down:
-						if (editMode) {
+						if (mode == editing) {
 							drawTile(window, spr_shooter_down, i, j);
-						} else {
+						} else if (mode == playing) {
 							tiles[i][j].spikeTimerU++;
 							if (tiles[i][j].spikeTimerU >= shootTimerMax-shootAnimMax) {
 								drawTile(window, spr_shooter_open_down, i, j);
@@ -220,9 +247,9 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 						}
 						break;
 					case shooter_left:
-						if (editMode) {
+						if (mode == editing) {
 							drawTile(window, spr_shooter_left, i, j);
-						} else {
+						} else if (mode == playing) {
 							tiles[i][j].spikeTimerU++;
 							if (tiles[i][j].spikeTimerU >= shootTimerMax-shootAnimMax) {
 								drawTile(window, spr_shooter_open_left, i, j);
@@ -248,9 +275,9 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 						}
 						break;
 					case shooter_right:
-						if (editMode) {
+						if (mode == editing) {
 							drawTile(window, spr_shooter_right, i, j);
-						} else {
+						} else if (mode == playing) {
 							tiles[i][j].spikeTimerU++;
 							if (tiles[i][j].spikeTimerU >= shootTimerMax-shootAnimMax) {
 								drawTile(window, spr_shooter_open_right, i, j);
@@ -289,7 +316,7 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 
 	//this manages drawing the preview and placing tiles on edit mode, and the player and sound effects on play mode
 
-	if (editMode) {
+	if (mode == editing) {
 		sf::Vector2i mpos = sf::Mouse::getPosition(window);
 		if (mpos.y > 28 && mpos.x > 208) { //not on menubar or panel
 			//this is the code for the translucent 'preview' of the block you are going to place
@@ -393,27 +420,12 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 				unsavedChanges = true;
 			}
 		}
-	} else {
+	} else if (mode == playing) {
  		if (!win) { //don't draw player if in win mode
-			if (player.recovering%24 >= 0 && player.recovering%24 < 12) {
-				spr_player.setPosition(player.tempx, player.tempy);
-				switch (player.facing) {
-					case up:    spr_player.setRotation(180); break;
-					case down:  spr_player.setRotation(0);   break;
-					case left:  spr_player.setRotation(90);  break;
-					case right: spr_player.setRotation(270); break;
-				}
-				window.draw(spr_player);
-			}
-			if (player.recovering > 0) {
-				player.recovering++;
-				if (player.recovering >= 240) {
-					player.recovering = 0;
-				}
-			}
+ 			player.draw(window, spr_player, spr_player_moving);
 		}
 
-			sf::Listener::setPosition(sf::Vector3f(player.tempx, 0.0f, player.tempy));
+		sf::Listener::setPosition(sf::Vector3f(player.tempx, 0.0f, player.tempy));
 
 		manageQueue(que_blade);
 		manageQueue(que_bullet_launch);
@@ -426,7 +438,7 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 	//this manages the UI code that doesn't move with the player/scrolling
 	//which is menubar and panel for edit mode, coin counter for play mode, and pause button for both
 
-	if (editMode) {
+	if (mode == editing) {
 		panel.draw(window);
 		menubar.draw(window);
 
@@ -439,7 +451,7 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 		} else if (menubar.clicked == "FILE->SAVE AS...") {
 			saveAs();
 		}
-	} else {
+	} else if (mode == playing) {
 		txt_coins.setString("@" + std::to_string(player.coins));
 		txt_coins.setOrigin(txt_coins.getGlobalBounds().width/2, 0);
 		txt_coins.setPosition(window.getSize().x/2, 10);
@@ -458,7 +470,7 @@ void stage::draw(sf::RenderWindow& window, bool disableClick)
 		}
 		barTimer++;
 		bars.setSize(sf::Vector2f(window.getSize().x, barHeight));
-		for (size_t i = 0; i < window.getSize().y/(barHeight*2); i++) {
+		for (size_t i = 0; i <= window.getSize().y/(barHeight*2); i++) {
 			window.draw(bars);
 			bars.move(0, barHeight*2);
 		}

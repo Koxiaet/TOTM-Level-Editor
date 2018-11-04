@@ -3257,7 +3257,7 @@ static char const * getVersion( char const * const aExecutable ) /*version must 
 }
 
 
-static int * const getMajorMinorPatch( char const * const aExecutable )
+static int * /*const*/ getMajorMinorPatch( char const * const aExecutable )
 {
 	static int lArray [3] ;
 	char * lTmp ;
@@ -4009,7 +4009,7 @@ notify=dbus.Interface(notif,'org.freedesktop.Notifications');\nexcept:\n\tprint(
 }
 
 
-static void sigHandler(int sig)
+static void sigHandler(/*int sig*/)
 {
         FILE * lIn ;
         if ( ( lIn = popen( "pactl unload-module module-sine" , "r" ) ) )

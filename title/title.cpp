@@ -1,68 +1,70 @@
 #include "title.hpp"
+#include "../rand.hpp"
+#include <iostream>
+#include <cmath>
 
-title::title()
+title::title(): but_play(fnt_totm), but_edit(fnt_totm), but_exit(fnt_totm), seaTimer(0)
 {
-	tex_button.loadFromFile("images/button.png");
-	tex_button.setSmooth(false);
-	spr_button.setTexture(tex_button);
-	spr_button.setScale(sf::Vector2f(4.0f, 4.0f));
-	spr_button.setOrigin(8, 8);
+	tex_background.loadFromFile("title/images/background.png");
+	tex_background.setSmooth(false);
+	spr_background.setTexture(tex_background);
+	spr_background.setScale(sf::Vector2f(4.0f, 4.0f));
+	spr_background.setOrigin(tex_background.getSize().x/2, 0);
+	spr_background.setColor(COL_LOW);
+	spr_tower.setTexture(tex_background);
+	spr_tower.setTextureRect(sf::IntRect(0, 0, tex_background.getSize().x, 1));
+	spr_tower.setScale(sf::Vector2f(4.0f, 4.0f));
+	spr_tower.setOrigin(tex_background.getSize().x/2, 0);
+	spr_tower.setColor(COL_LOW);
 
-	tex_button_pressed.loadFromFile("images/button_pressed.png");
-	tex_button_pressed.setSmooth(false);
-	spr_button_pressed.setTexture(tex_button_pressed);
-	spr_button_pressed.setScale(sf::Vector2f(4.0f, 4.0f));
-	spr_button_pressed.setOrigin(8, 8);
-
-	tex_edit.loadFromFile("title/images/editButton.png");
-	tex_edit.setSmooth(false);
-	spr_edit.setTexture(tex_edit);
-	spr_edit.setScale(sf::Vector2f(4.0f, 4.0f));
-	spr_edit.setOrigin(8, 8);
-
-	tex_play.loadFromFile("title/images/playButton.png");
-	tex_play.setSmooth(false);
-	spr_play.setTexture(tex_play);
-	spr_play.setScale(sf::Vector2f(4.0f, 4.0f));
-	spr_play.setOrigin(8, 8);
-
-	tex_exit.loadFromFile("title/images/exitButton.png");
-	tex_exit.setSmooth(false);
-	spr_exit.setTexture(tex_exit);
-	spr_exit.setScale(sf::Vector2f(4.0f, 4.0f));
-	spr_exit.setOrigin(8, 8);
+	tex_title.loadFromFile("title/images/logo.png");
+	tex_title.setSmooth(false);
+	spr_title.setTexture(tex_title);
+	spr_title.setScale(sf::Vector2f(4.0f, 4.0f));
+	spr_title.setOrigin(tex_title.getSize().x/2, 0);
+	spr_title.setColor(COL_MED);
 
 	fnt_totm.loadFromFile("totm.ttf");
 
-	txt_name.setFont(fnt_totm);
-	txt_name.setCharacterSize(40);
-	txt_name.setString("TOMB OF THE MASK");
-	txt_name.setFillColor(sf::Color(0xFF, 0xFF, 0x00));
-	txt_name.setOrigin(txt_name.getGlobalBounds().width/2, 0);
+	but_play.str = "p";
+	but_edit.str = "e";
+	but_exit.str = "x";
 
 	txt_sub.setFont(fnt_totm);
 	txt_sub.setCharacterSize(20);
 	txt_sub.setString("LEVEL CREATOR");
-	txt_sub.setFillColor(sf::Color(0xFF, 0xFF, 0x00));
+	txt_sub.setFillColor(COL_MED);
 	txt_sub.setOrigin(txt_sub.getGlobalBounds().width/2, 0);
+
+	sea.setFillColor(COL_LOW);
+	sea.setSize(sf::Vector2f(8, 4));
+
+	oldSeed = r.getseed();
+
+	clouds = new cloud[cloudLength];
+	for (size_t i = 0; i < cloudLength; i++) {
+		clouds[i].create(300);
+	}
+
+	stars = new star[starLength];
+	for (size_t i = 0; i < starLength; i++) {
+		stars[i].create(800, 300 + 64 + 22*4);
+	}
 }
 
-uint title::testClicked(sf::RenderWindow& window) //0 for none, 1 for play, 2 for edit, 3 for exit
+uint title::testClicked() //0 for none, 1 for play, 2 for edit, 3 for exit
 {
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-		if (spr_play.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))) {
+		if (but_play.isClicked()) {
 			return playButton;
 		}
-		if (spr_edit.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))) {
+		if (but_edit.isClicked()) {
 			return editButton;
 		}
-		if (spr_exit.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))) {
+		if (but_exit.isClicked()) {
 			return exitButton;
 		}
 	}
-	// if (key(Escape)) {
-	// 	return exitButton;
-	// }
 	return noButton;
 }
 
@@ -70,43 +72,72 @@ void title::draw(sf::RenderWindow& window)
 {
 	window.setTitle("Tomb of the Mask");
 	window.setView(sf::View(sf::FloatRect(0, 0, window.getSize().x, window.getSize().y)));
-	txt_name.setPosition(window.getSize().x/2, 20);
-	window.draw(txt_name);
-	txt_sub.setPosition(window.getSize().x/2, txt_name.getGlobalBounds().height + 30);
+
+	for (size_t i = 0; i < starLength; i++) {
+		stars[i].draw(window);
+	}
+
+	for (size_t i = 0; i < cloudLength; i++) { //0 to 7 inclusive clouds
+		clouds[i].maxy = window.getSize().y/2;
+		clouds[i].draw(window);
+	}
+
+	for (uint i = 0; i < (window.getSize().y/2 + 64)/4 + 1; i++) {
+		spr_tower.setPosition(window.getSize().x/2, i*4);
+		window.draw(spr_tower);
+	}
+
+	spr_background.setPosition(window.getSize().x/2, window.getSize().y/2 + 64);
+	window.draw(spr_background);
+
+	spr_title.setPosition(window.getSize().x/2, 0);
+	window.draw(spr_title);
+	txt_sub.setPosition(window.getSize().x/2, (tex_title.getSize().y*4));
 	window.draw(txt_sub);
 
-	spr_edit.setPosition(window.getSize().x/2-128, window.getSize().y/2);
-	spr_play.setPosition(window.getSize().x/2,     window.getSize().y/2);
-	spr_exit.setPosition(window.getSize().x/2+128, window.getSize().y/2);
+	but_edit.setPosition(0, window.getSize().y - 64);
+	but_edit.setWidth(64);
+	but_play.setPosition(64, window.getSize().y - 64);
+	but_play.setWidth(window.getSize().x - 128);
+	but_exit.setPosition(window.getSize().x - 64, window.getSize().y - 64);
+	but_exit.setWidth(64);
 
-	if (spr_edit.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))) {
-		spr_button_pressed.setPosition(spr_edit.getPosition());
-		spr_edit.move(0, 8);
-		window.draw(spr_button_pressed);
-	} else {
-		spr_button.setPosition(spr_edit.getPosition());
-		window.draw(spr_button);
+	but_edit.draw(window);
+	but_play.draw(window);
+	but_exit.draw(window);
+
+	uint counter = 1;
+	uint gap = 12;
+	for (uint i = window.getSize().y/2 + 64 + 22*4; i < window.getSize().y-64; i += gap) {
+		for (uint j = 0; j < window.getSize().x; j += 16) {
+			if ((double)r.rand() / (double)r.rand_max < 1.0 / (1 + exp(0.5*(double)counter - 4))) {
+				sea.setPosition(j, i);
+				window.draw(sea);
+			}
+		}
+		counter += 2;
+		gap += 4;
 	}
 
-	if (spr_play.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))) {
-		spr_button_pressed.setPosition(spr_play.getPosition());
-		spr_play.move(0, 8);
-		window.draw(spr_button_pressed);
+	if (seaTimer < 20) {
+		r.reseed(oldSeed);
 	} else {
-		spr_button.setPosition(spr_play.getPosition());
-		window.draw(spr_button);
+		seaTimer = 0;
+		oldSeed = r.getseed();
 	}
 
-	if (spr_exit.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y))) {
-		spr_button_pressed.setPosition(spr_exit.getPosition());
-		spr_exit.move(0, 8);
-		window.draw(spr_button_pressed);
-	} else {
-		spr_button.setPosition(spr_exit.getPosition());
-		window.draw(spr_button);
-	}
+	seaTimer++;
+}
 
-	window.draw(spr_edit);
-	window.draw(spr_play);
-	window.draw(spr_exit);
+void title::resize(sf::RenderWindow& window)
+{
+	for (size_t i = 0; i < starLength; i++) {
+		stars[i].create(window.getSize().x, window.getSize().y/2 + 64 + 22*4);
+	}
+}
+
+title::~title()
+{
+	delete [] stars;
+	delete [] clouds;
 }

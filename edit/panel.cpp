@@ -3,10 +3,10 @@
 panel::panel(): selectedTileL(3), selectedTileR(0)
 {
 	bkg.setPosition(0, 28);
-	bkg.setFillColor(sf::Color::Black);
+	bkg.setFillColor(COL_NONE);
 
-	outline.setFillColor(sf::Color(0x00000000));
-	outline.setOutlineColor(sf::Color(0xFF, 0xFF, 0x00));
+	outline.setFillColor(COL_TRANSPARENT);
+	outline.setOutlineColor(COL_MED);
 	outline.setOutlineThickness(2.0f);
 	outline.setSize(sf::Vector2f(40, 40));
 	outline.setOrigin(20, 20);
@@ -14,11 +14,11 @@ panel::panel(): selectedTileL(3), selectedTileR(0)
 	fnt_totm.loadFromFile("totm.ttf");
 	txt_label.setFont(fnt_totm);
 	txt_label.setCharacterSize(15);
-	txt_label.setFillColor(sf::Color(0xFF, 0xFF, 0x00));
+	txt_label.setFillColor(COL_MED);
 
-	selector[0].color = sf::Color::Yellow;
-	selector[1].color = sf::Color::Yellow;
-	selector[2].color = sf::Color::Yellow;
+	selector[0].color = COL_MED;
+	selector[1].color = COL_MED;
+	selector[2].color = COL_MED;
 }
 
 void panel::draw(sf::RenderWindow& window)

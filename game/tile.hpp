@@ -1,4 +1,5 @@
 #include <cstdint>
+#include "../colors.hpp"
 
 #ifndef __KAI__TOTM__TILE__
 #define __KAI__TOTM__TILE__ 1

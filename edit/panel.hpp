@@ -1,7 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
-
 #include "panelItem.hpp"
 
 #ifndef __KAI__TOTM__PANEL__

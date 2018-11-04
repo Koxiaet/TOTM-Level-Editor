@@ -1,5 +1,10 @@
 #include <SFML/Graphics.hpp>
 #include <cstdint>
+#include <vector>
+#include "../colors.hpp"
+#include "button.hpp"
+#include "cloud.hpp"
+#include "star.hpp"
 
 #ifndef __KAI__TOTM__TITLE__
 #define __KAI__TOTM__TITLE__ 1
@@ -17,27 +22,34 @@ enum buttonClicked: uint8_t
 class title
 {
 protected:
-	sf::Texture tex_button;
-	sf::Sprite  spr_button;
-	sf::Texture tex_button_pressed;
-	sf::Sprite  spr_button_pressed;
+	sf::Texture tex_background;
+	sf::Sprite  spr_background;
+	sf::Sprite  spr_tower;
 
-	sf::Texture tex_play;
-	sf::Sprite  spr_play;
+	button but_play;
+	button but_edit;
+	button but_exit;
 
-	sf::Texture tex_edit;
-	sf::Sprite  spr_edit;
-
-	sf::Texture tex_exit;
-	sf::Sprite  spr_exit;
+	sf::Texture tex_title;
+	sf::Sprite  spr_title;
 
 	sf::Font fnt_totm;
-	sf::Text txt_name;
 	sf::Text txt_sub;
+
+	sf::RectangleShape sea;
+	uint seaTimer;
+	unsigned long oldSeed;
+
+	star*  stars;
+	const size_t starLength = 20;
+	cloud* clouds;
+	const size_t cloudLength = 5;
 public:
 	title();
-	uint testClicked(sf::RenderWindow& window);
+	uint testClicked();
 	void draw(sf::RenderWindow& window);
+	void resize(sf::RenderWindow& window);
+	~title();
 };
 
 #endif

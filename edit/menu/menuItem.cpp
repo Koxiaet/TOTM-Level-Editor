@@ -104,11 +104,11 @@ void menuItem::drawName(
 	highlight.setSize(sf::Vector2f(width + 2*hpadding, text.getGlobalBounds().height + 2*vpadding));
 
 	if (highlight.getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y)) {
-		text.setFillColor(sf::Color(0, 0, 0));
+		text.setFillColor(COL_NONE);
 		window.draw(highlight);
 		isHovering = true;
 	} else {
-		text.setFillColor(sf::Color(0xFF, 0xFF, 00));
+		text.setFillColor(COL_MED);
 		isHovering = false;
 	}
 
